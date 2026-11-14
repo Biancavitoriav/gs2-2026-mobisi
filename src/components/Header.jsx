@@ -1,54 +1,27 @@
-import { useState } from 'react'
-
-const links = [
-  ['solucao', 'Solução'],
-  ['beneficios', 'Benefícios'],
-  ['como-funciona', 'Como funciona'],
-  ['contato', 'Contato'],
-]
+import { Link } from "react-router-dom";
+import logoMobisi from "../assets/logo-mobisi.png";
+import logoSimbolo from "../assets/logo-simbolo.png";
 
 export default function Header() {
-  const [menuAberto, setMenuAberto] = useState(false)
-
-  function fecharMenu() {
-    setMenuAberto(false)
-  }
-
   return (
-    <header className="cabecalho">
-      <div className="container cabecalho-linha">
-        <a href="#solucao" className="logo" aria-label="Mobisi - página inicial" onClick={fecharMenu}>
-          mobi<strong>si</strong>
-        </a>
-
-        <button
-          type="button"
-          className="botao-menu"
-          aria-label={menuAberto ? 'Fechar menu' : 'Abrir menu'}
-          aria-expanded={menuAberto}
-          onClick={() => setMenuAberto((aberto) => !aberto)}
-        >
-          <span />
-          <span />
-          <span />
-        </button>
-
-        <nav className={`menu ${menuAberto ? 'menu-aberto' : ''}`} aria-label="Navegação principal">
-          <ul className="lista-menu">
-            {links.map(([id, nome], index) => (
-              <li key={id}>
-                <a
-                  href={`#${id}`}
-                  className={`link-menu ${index === 0 ? 'ativo' : ''}`}
-                  onClick={fecharMenu}
-                >
-                  {nome}
-                </a>
-              </li>
-            ))}
-          </ul>
-        </nav>
+    <header className="topbar">
+      <div className="topbar-inner">
+        <Link className="brand" to="/" aria-label="Mobisi, início">
+          <img
+            className="brand-symbol"
+            src={logoSimbolo}
+            alt=""
+            aria-hidden="true"
+          />
+          <img className="brand-wordmark" src={logoMobisi} alt="Mobisi" />
+        </Link>
+        <div className="profile-chip">
+          <span className="profile-avatar" aria-hidden="true">
+            V
+          </span>
+          <span>Vicente Souza</span>
+        </div>
       </div>
     </header>
-  )
+  );
 }

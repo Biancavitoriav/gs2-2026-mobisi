@@ -1,6 +1,6 @@
 # Mobisi
 
-Telas iniciais de Login e Cadastro do projeto Mobisi, criadas com React e Vite seguindo a organização adotada no projeto de referência `Sprint3-Jovi`.
+Aplicação do projeto Mobisi, criada com React e Vite. A entrada da aplicação é direta, sem cadastro ou login.
 
 ## Tecnologias
 
@@ -12,10 +12,9 @@ Telas iniciais de Login e Cadastro do projeto Mobisi, criadas com React e Vite s
 
 ## Telas disponíveis
 
-- Login
-- Cadastro
-
-Os botões alternam entre as duas telas. O formulário está preparado apenas para a interface nesta etapa, sem integração com autenticação ou banco de dados.
+- Lista de lugares acessíveis com busca e filtro de favoritos
+- Detalhes do local e informações de acessibilidade
+- Formulário de avaliação por categoria
 
 ## Executar localmente
 
