@@ -4,8 +4,6 @@
   color: #24150d;
   background: #f4f6f8;
   font-family: "DM Sans", "Segoe UI", sans-serif;
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
   --space-1: 4px;
   --space-2: 8px;
   --space-3: 12px;
@@ -307,9 +305,31 @@ h2 {
   display: inline-flex;
   align-items: center;
   gap: 2px;
-  color: var(--gold);
   font-size: 23px;
   line-height: 1;
+}
+.star {
+  position: relative;
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  color: #d7d1cc;
+}
+.star > i,
+.star-fill {
+  position: absolute;
+  inset: 0;
+}
+.star-fill {
+  width: var(--star-fill);
+  overflow: hidden;
+  color: var(--gold);
+}
+.star > i,
+.star-fill > i {
+  display: block;
+  width: 1em;
+  height: 1em;
 }
 .review-count {
   color: #4e4a47;

@@ -172,7 +172,7 @@ export default function PlaceDetailsPage({
               <h3>Avaliação</h3>
               <div className="detail-rating-line">
                 <strong>{place.rating}</strong>
-                <Stars />
+                <Stars rating={place.rating} />
                 <small>({place.reviews} avaliações)</small>
               </div>
             </div>
