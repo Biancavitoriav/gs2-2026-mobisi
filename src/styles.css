@@ -231,12 +231,12 @@ h2 {
   background: #fff;
   box-shadow: 0 3px 12px rgba(42, 57, 71, 0.04);
   transition:
-    transform 0.2s ease,
-    box-shadow 0.2s ease;
+    transform 0.25s ease,
+    box-shadow 0.25s ease;
 }
 .place-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 12px 24px rgba(29, 48, 64, 0.1);
+  transform: translateY(-8px);
+  box-shadow: 0 15px 25px rgba(29, 48, 64, 0.18);
 }
 .place-image-wrap {
   position: relative;
@@ -250,9 +250,6 @@ h2 {
   height: 100%;
   object-fit: cover;
   transition: transform 0.35s ease;
-}
-.place-card:hover .place-image {
-  transform: scale(1.03);
 }
 .place-content {
   min-height: 155px;

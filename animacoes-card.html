@@ -1,0 +1,542 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Opções de animação para cards</title>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap");
+
+      :root {
+        --blue: #075b91;
+        --blue-dark: #004778;
+        --ink: #24150d;
+        --muted: #6f6966;
+        --gold: #f1bd32;
+        --page: #f4f6f8;
+        --line: #dfe2e5;
+      }
+
+      * { box-sizing: border-box; }
+
+      body {
+        margin: 0;
+        min-width: 320px;
+        min-height: 100vh;
+        color: var(--ink);
+        background: var(--page);
+        font-family: "DM Sans", "Segoe UI", sans-serif;
+      }
+
+      button { font: inherit; cursor: pointer; }
+
+      .topbar {
+        color: #fff;
+        background: var(--blue);
+        box-shadow: 0 1px 0 rgba(0, 0, 0, .08);
+      }
+
+      .topbar-inner,
+      main {
+        width: min(1180px, calc(100% - 40px));
+        margin: 0 auto;
+      }
+
+      .topbar-inner {
+        min-height: 72px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+      }
+
+      .brand {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        color: #fff;
+        font-family: "Plus Jakarta Sans", sans-serif;
+        font-size: 18px;
+        font-weight: 800;
+        letter-spacing: -.04em;
+      }
+
+      .brand-mark {
+        width: 30px;
+        height: 30px;
+        display: grid;
+        place-items: center;
+        border: 2px solid rgba(255, 255, 255, .8);
+        border-radius: 10px 10px 10px 3px;
+        font-size: 14px;
+      }
+
+      .topbar-note {
+        color: rgba(255, 255, 255, .78);
+        font-size: 12px;
+      }
+
+      main { padding: 54px 0 80px; }
+
+      .intro { margin-bottom: 30px; }
+
+      .eyebrow {
+        margin: 0 0 9px;
+        color: var(--blue);
+        font-size: 12px;
+        font-weight: 800;
+        letter-spacing: .16em;
+        text-transform: uppercase;
+      }
+
+      h1,
+      h2,
+      h3 { font-family: "Plus Jakarta Sans", "Segoe UI", sans-serif; }
+
+      h1 {
+        max-width: 720px;
+        margin: 0 0 12px;
+        font-size: clamp(30px, 5vw, 48px);
+        line-height: 1.08;
+        letter-spacing: -.055em;
+      }
+
+      .intro-copy {
+        max-width: 670px;
+        margin: 0;
+        color: var(--muted);
+        font-size: 16px;
+        line-height: 1.55;
+      }
+
+      .toolbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 15px;
+        margin-bottom: 18px;
+      }
+
+      .toolbar h2 {
+        margin: 0;
+        font-size: 22px;
+        letter-spacing: -.04em;
+      }
+
+      .selection-info {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      .selection-info strong { color: var(--blue-dark); }
+
+      .clear-button {
+        padding: 8px 12px;
+        border: 1px solid #c9d8e2;
+        border-radius: 8px;
+        background: #fff;
+        color: var(--blue-dark);
+        font-size: 12px;
+        transition: background .2s, border-color .2s;
+      }
+
+      .clear-button:hover {
+        border-color: var(--blue);
+        background: #eef7fc;
+      }
+
+      .options-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 20px;
+      }
+
+      .option {
+        min-width: 0;
+        padding: 9px;
+        border: 2px solid transparent;
+        border-radius: 17px;
+        background: #fff;
+        box-shadow: 0 4px 14px rgba(42, 57, 71, .06);
+        transition: border-color .25s, box-shadow .25s, transform .25s;
+      }
+
+      .option.selected {
+        border-color: #43a579;
+        box-shadow: 0 8px 25px rgba(67, 165, 121, .18);
+      }
+
+      .option-heading {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 8px;
+        min-height: 58px;
+        padding: 7px 5px 10px;
+      }
+
+      .option-number {
+        display: inline-grid;
+        width: 23px;
+        height: 23px;
+        place-items: center;
+        flex: 0 0 23px;
+        border-radius: 50%;
+        background: #eaf3f8;
+        color: var(--blue-dark);
+        font-size: 11px;
+        font-weight: 800;
+      }
+
+      .option-heading h3 {
+        flex: 1;
+        margin: 1px 0 0;
+        color: #17120f;
+        font-size: 14px;
+        line-height: 1.25;
+        letter-spacing: -.025em;
+      }
+
+      .selected-badge {
+        display: none;
+        padding: 4px 6px;
+        border-radius: 999px;
+        background: #dcf3e7;
+        color: #20804c;
+        font-size: 9px;
+        font-weight: 700;
+        white-space: nowrap;
+      }
+
+      .option.selected .selected-badge { display: inline-block; }
+
+      .demo-card {
+        overflow: hidden;
+        border: 1px solid #dcdfe2;
+        border-radius: 12px;
+        background: #fff;
+        cursor: pointer;
+        outline: none;
+      }
+
+      .demo-image-wrap {
+        position: relative;
+        height: 132px;
+        overflow: hidden;
+        background: #d9e2e7;
+      }
+
+      .demo-image {
+        display: block;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .demo-content { padding: 12px 13px 13px; }
+
+      .demo-content h4 {
+        margin: 0 0 5px;
+        color: #17120f;
+        font-size: 15px;
+      }
+
+      .address {
+        margin: 0 0 9px;
+        overflow: hidden;
+        color: #6d6a68;
+        font-size: 10px;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .rating {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        color: var(--gold);
+        font-size: 15px;
+        line-height: 1;
+      }
+
+      .rating small {
+        color: #4e4a47;
+        font-size: 10px;
+      }
+
+      .demo-actions {
+        display: flex;
+        gap: 7px;
+        margin-top: 12px;
+      }
+
+      .heart,
+      .details {
+        height: 30px;
+        border-radius: 6px;
+      }
+
+      .heart {
+        width: 32px;
+        flex: 0 0 32px;
+        border: 1px solid #f08c8f;
+        background: #fff;
+        color: #ef8085;
+        font-size: 16px;
+      }
+
+      .details {
+        width: 100%;
+        border: 0;
+        background: var(--blue-dark);
+        color: #fff;
+        font-size: 11px;
+      }
+
+      /* 1. Elevação suave */
+      .lift .demo-card { transition: transform .25s, box-shadow .25s; }
+      .lift .demo-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 15px 25px rgba(29, 48, 64, .18);
+      }
+
+      /* 2. Zoom na imagem */
+      .zoom .demo-image { transition: transform .45s ease; }
+      .zoom .demo-card:hover .demo-image { transform: scale(1.12); }
+
+      /* 3. Overlay */
+      .overlay .demo-image-wrap::after {
+        content: "Ver detalhes";
+        position: absolute;
+        inset: 0;
+        display: grid;
+        place-items: center;
+        background: rgba(0, 71, 120, .67);
+        color: #fff;
+        font-size: 12px;
+        font-weight: 700;
+        opacity: 0;
+        transition: opacity .3s;
+      }
+      .overlay .demo-card:hover .demo-image-wrap::after { opacity: 1; }
+
+      /* 4. Borda destacada */
+      .border .demo-card { transition: border-color .3s, box-shadow .3s; }
+      .border .demo-card:hover {
+        border-color: var(--blue);
+        box-shadow: 0 0 0 4px rgba(7, 91, 145, .14);
+      }
+
+      /* 5. Inclinação 3D */
+      .tilt .demo-card { transition: transform .35s, box-shadow .35s; }
+      .tilt .demo-card:hover {
+        transform: perspective(700px) rotateX(3deg) rotateY(-4deg) translateY(-3px);
+        box-shadow: 10px 13px 20px rgba(29, 48, 64, .16);
+      }
+
+      /* 6. Botão aparecendo */
+      .button-rise .demo-actions {
+        transform: translateY(8px);
+        opacity: .35;
+        transition: transform .3s, opacity .3s;
+      }
+      .button-rise .demo-card:hover .demo-actions {
+        transform: translateY(0);
+        opacity: 1;
+      }
+
+      /* 7. Coração pulsando */
+      .heart-pulse .demo-card:hover .heart { animation: pulse .7s ease-in-out; }
+      @keyframes pulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.22); }
+      }
+
+      /* 8. Combinação */
+      .combo .demo-card { transition: transform .3s, box-shadow .3s; }
+      .combo .demo-image { transition: transform .4s; }
+      .combo .demo-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 14px 28px rgba(29, 48, 64, .16);
+      }
+      .combo .demo-card:hover .demo-image { transform: scale(1.06); }
+      .combo .details { transition: background .2s, transform .2s; }
+      .combo .demo-card:hover .details {
+        background: #0b6ca8;
+        transform: translateY(-2px);
+      }
+
+      .demo-card:focus-visible {
+        box-shadow: 0 0 0 4px rgba(7, 91, 145, .25);
+      }
+
+      .footnote {
+        margin: 25px 0 0;
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.5;
+      }
+
+      @media (max-width: 950px) {
+        .options-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      }
+
+      @media (max-width: 560px) {
+        .topbar-inner,
+        main { width: min(100% - 28px, 460px); }
+        .topbar-inner { min-height: 64px; }
+        .topbar-note { display: none; }
+        main { padding: 40px 0 55px; }
+        .toolbar { align-items: flex-start; flex-direction: column; }
+        .selection-info { width: 100%; justify-content: space-between; }
+        .options-grid { grid-template-columns: 1fr; }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after {
+          animation-duration: .01ms !important;
+          animation-iteration-count: 1 !important;
+          scroll-behavior: auto !important;
+          transition-duration: .01ms !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="topbar-inner">
+        <div class="brand"><span class="brand-mark">M</span> Mobisi · animações</div>
+        <span class="topbar-note">Passe o mouse para testar</span>
+      </div>
+    </header>
+
+    <main>
+      <section class="intro">
+        <p class="eyebrow">Galeria de referências</p>
+        <h1>Escolha o movimento ideal para o seu card</h1>
+        <p class="intro-copy">
+          Compare as opções abaixo passando o mouse sobre cada card. Clique nos seus favoritos para marcar as animações que você quer levar para o projeto.
+        </p>
+      </section>
+
+      <div class="toolbar">
+        <h2>Opções de hover</h2>
+        <div class="selection-info">
+          <span><strong id="selected-count">0</strong> selecionadas</span>
+          <button class="clear-button" id="clear-selection" type="button">Limpar seleção</button>
+        </div>
+      </div>
+
+      <section class="options-grid" aria-label="Demonstrações de animação">
+        <article class="option lift">
+          <div class="option-heading">
+            <span class="option-number">1</span>
+            <h3>Elevação suave</h3>
+            <span class="selected-badge">Selecionada</span>
+          </div>
+          <div class="demo-card" tabindex="0" role="button" aria-label="Selecionar elevação suave">
+            <div class="demo-image-wrap"><img class="demo-image" src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&amp;fit=crop&amp;w=900&amp;q=85" alt="Praia" /></div>
+            <div class="demo-content"><h4>Local teste 1</h4><p class="address">Rua Teste 1, Centro, São Paulo</p><div class="rating">★★★★★ <small>(1)</small></div><div class="demo-actions"><button class="heart" type="button">♡</button><button class="details" type="button">Ver detalhes</button></div></div>
+          </div>
+        </article>
+
+        <article class="option zoom">
+          <div class="option-heading"><span class="option-number">2</span><h3>Zoom na imagem</h3><span class="selected-badge">Selecionada</span></div>
+          <div class="demo-card" tabindex="0" role="button" aria-label="Selecionar zoom na imagem">
+            <div class="demo-image-wrap"><img class="demo-image" src="https://images.unsplash.com/photo-1500534623283-312aade485b7?auto=format&amp;fit=crop&amp;w=900&amp;q=85" alt="Montanhas" /></div>
+            <div class="demo-content"><h4>Local teste 2</h4><p class="address">Av. Paulista, Bela Vista, São Paulo</p><div class="rating">★★★★★ <small>(8)</small></div><div class="demo-actions"><button class="heart" type="button">♡</button><button class="details" type="button">Ver detalhes</button></div></div>
+          </div>
+        </article>
+
+        <article class="option overlay">
+          <div class="option-heading"><span class="option-number">3</span><h3>Overlay com ação</h3><span class="selected-badge">Selecionada</span></div>
+          <div class="demo-card" tabindex="0" role="button" aria-label="Selecionar overlay com ação">
+            <div class="demo-image-wrap"><img class="demo-image" src="https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&amp;fit=crop&amp;w=900&amp;q=85" alt="Lago entre montanhas" /></div>
+            <div class="demo-content"><h4>Parque das Águas</h4><p class="address">Rua das Flores, Zona Sul</p><div class="rating">★★★★☆ <small>(14)</small></div><div class="demo-actions"><button class="heart" type="button">♡</button><button class="details" type="button">Ver detalhes</button></div></div>
+          </div>
+        </article>
+
+        <article class="option border">
+          <div class="option-heading"><span class="option-number">4</span><h3>Borda destacada</h3><span class="selected-badge">Selecionada</span></div>
+          <div class="demo-card" tabindex="0" role="button" aria-label="Selecionar borda destacada">
+            <div class="demo-image-wrap"><img class="demo-image" src="https://images.unsplash.com/photo-1493246507139-91e8fad9978e?auto=format&amp;fit=crop&amp;w=900&amp;q=85" alt="Floresta" /></div>
+            <div class="demo-content"><h4>Reserva Verde</h4><p class="address">Estrada do Sol, Campinas</p><div class="rating">★★★★★ <small>(23)</small></div><div class="demo-actions"><button class="heart" type="button">♡</button><button class="details" type="button">Ver detalhes</button></div></div>
+          </div>
+        </article>
+
+        <article class="option tilt">
+          <div class="option-heading"><span class="option-number">5</span><h3>Inclinação 3D discreta</h3><span class="selected-badge">Selecionada</span></div>
+          <div class="demo-card" tabindex="0" role="button" aria-label="Selecionar inclinação 3D discreta">
+            <div class="demo-image-wrap"><img class="demo-image" src="https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&amp;fit=crop&amp;w=900&amp;q=85" alt="Trilha na floresta" /></div>
+            <div class="demo-content"><h4>Trilha do Bosque</h4><p class="address">Alameda Verde, São Paulo</p><div class="rating">★★★★☆ <small>(6)</small></div><div class="demo-actions"><button class="heart" type="button">♡</button><button class="details" type="button">Ver detalhes</button></div></div>
+          </div>
+        </article>
+
+        <article class="option button-rise">
+          <div class="option-heading"><span class="option-number">6</span><h3>Botão aparecendo</h3><span class="selected-badge">Selecionada</span></div>
+          <div class="demo-card" tabindex="0" role="button" aria-label="Selecionar botão aparecendo">
+            <div class="demo-image-wrap"><img class="demo-image" src="https://images.unsplash.com/photo-1470252649378-9c29740c9fa8?auto=format&amp;fit=crop&amp;w=900&amp;q=85" alt="Pôr do sol" /></div>
+            <div class="demo-content"><h4>Mirante do Sol</h4><p class="address">Rua do Horizonte, Santos</p><div class="rating">★★★★★ <small>(31)</small></div><div class="demo-actions"><button class="heart" type="button">♡</button><button class="details" type="button">Ver detalhes</button></div></div>
+          </div>
+        </article>
+
+        <article class="option heart-pulse">
+          <div class="option-heading"><span class="option-number">7</span><h3>Coração pulsando</h3><span class="selected-badge">Selecionada</span></div>
+          <div class="demo-card" tabindex="0" role="button" aria-label="Selecionar coração pulsando">
+            <div class="demo-image-wrap"><img class="demo-image" src="https://images.unsplash.com/photo-1470770841072-f978cf4d019e?auto=format&amp;fit=crop&amp;w=900&amp;q=85" alt="Lago na montanha" /></div>
+            <div class="demo-content"><h4>Refúgio da Serra</h4><p class="address">Estrada da Serra, Atibaia</p><div class="rating">★★★★★ <small>(11)</small></div><div class="demo-actions"><button class="heart" type="button">♡</button><button class="details" type="button">Ver detalhes</button></div></div>
+          </div>
+        </article>
+
+        <article class="option combo">
+          <div class="option-heading"><span class="option-number">8</span><h3>Combinação elegante</h3><span class="selected-badge">Selecionada</span></div>
+          <div class="demo-card" tabindex="0" role="button" aria-label="Selecionar combinação elegante">
+            <div class="demo-image-wrap"><img class="demo-image" src="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&amp;fit=crop&amp;w=900&amp;q=85" alt="Paisagem natural" /></div>
+            <div class="demo-content"><h4>Vista do Vale</h4><p class="address">Rua das Palmeiras, Jundiaí</p><div class="rating">★★★★★ <small>(19)</small></div><div class="demo-actions"><button class="heart" type="button">♡</button><button class="details" type="button">Ver detalhes</button></div></div>
+          </div>
+        </article>
+      </section>
+
+      <p class="footnote">Dica: para um resultado parecido com o card atual do Mobisi, as opções 1, 2 e 8 são as mais equilibradas.</p>
+    </main>
+
+    <script>
+      const options = [...document.querySelectorAll('.option')];
+      const count = document.querySelector('#selected-count');
+      const clearButton = document.querySelector('#clear-selection');
+
+      function updateCount() {
+        count.textContent = document.querySelectorAll('.option.selected').length;
+      }
+
+      options.forEach((option) => {
+        const demoCard = option.querySelector('.demo-card');
+
+        function toggleSelection() {
+          option.classList.toggle('selected');
+          updateCount();
+        }
+
+        demoCard.addEventListener('click', (event) => {
+          if (event.target.closest('button')) return;
+          toggleSelection();
+        });
+
+        demoCard.addEventListener('keydown', (event) => {
+          if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            toggleSelection();
+          }
+        });
+      });
+
+      clearButton.addEventListener('click', () => {
+        options.forEach((option) => option.classList.remove('selected'));
+        updateCount();
+      });
+    </script>
+  </body>
+</html>
