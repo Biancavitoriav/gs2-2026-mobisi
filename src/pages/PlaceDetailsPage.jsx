@@ -6,6 +6,7 @@ import {
   PhoneIcon,
   PinIcon,
 } from "../components/Icons";
+import PlaceImage from "../components/PlaceImage";
 import { Stars } from "../components/StarRating";
 
 function LocalInfo({ place }) {
@@ -72,6 +73,7 @@ function DetailGroup({ group }) {
   const total = group.sim + group.nao + group.naoSei;
   const percentage =
     group.percentage == null ? null : `${Number(group.percentage).toFixed(0)}%`;
+  const responseCount = Number(group.responseCount) || 0;
   return (
     <section className="accessibility-group">
       <h3>
@@ -88,10 +90,19 @@ function DetailGroup({ group }) {
               {group.statusLabel}
             </span>
           </div>
-          {total === 0 ? (
+          {total === 0 && responseCount === 0 ? (
             <p>
               <span className="bullet bullet-2" />
               Ainda não há respostas registradas
+            </p>
+          ) : total === 0 ? (
+            <p>
+              <span className="bullet bullet-2" />
+              {responseCount}{" "}
+              {responseCount === 1
+                ? "avaliação registrada"
+                : "avaliações registradas"}
+              , mas o resumo das respostas ainda não está disponível
             </p>
           ) : (
             <>
@@ -123,7 +134,10 @@ export default function PlaceDetailsPage({
   onBack,
   onEvaluate,
 }) {
-  const accessibilityGroups = mapAccessibilityGroups(place.accessibility);
+  const accessibilityGroups = mapAccessibilityGroups(
+    place.accessibility,
+    place.reviews,
+  );
   return (
     <main className="details-page">
       <button type="button" className="back-link" onClick={onBack}>
@@ -131,11 +145,7 @@ export default function PlaceDetailsPage({
         Voltar
       </button>
       <section className="detail-overview" aria-labelledby="detail-title">
-        <img
-          src={place.image}
-          alt={`Imagem de ${place.name}`}
-          className="detail-image"
-        />
+        <PlaceImage place={place} className="detail-image" />
         <div className="detail-side">
           <div className="detail-heading">
             <div>

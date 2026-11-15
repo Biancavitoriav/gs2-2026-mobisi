@@ -1,4 +1,5 @@
 import { HeartIcon } from "./Icons";
+import PlaceImage from "./PlaceImage";
 import StarRating from "./StarRating";
 
 export default function PlaceCard({
@@ -18,11 +19,7 @@ export default function PlaceCard({
       tabIndex="0"
     >
       <div className="place-image-wrap">
-        <img
-          src={place.image}
-          alt={`Imagem de ${place.name}`}
-          className="place-image"
-        />
+        <PlaceImage place={place} className="place-image" />
       </div>
       <div className="place-content">
         <div>
