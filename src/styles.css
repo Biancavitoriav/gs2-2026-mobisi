@@ -19,6 +19,7 @@
   --blue: #075b91;
   --blue-dark: #004778;
   --gold: #f1bd32;
+  --topbar-height: 72px;
 }
 
 * {
@@ -57,18 +58,26 @@ input:focus-visible,
 }
 
 .topbar {
+  position: fixed;
+  inset: 0 0 auto;
+  z-index: 1000;
   background: var(--blue);
   color: #fff;
   box-shadow: 0 1px 0 rgba(0, 0, 0, 0.06);
 }
 .topbar-inner {
-  min-height: 72px;
+  height: var(--topbar-height);
+  min-height: var(--topbar-height);
   max-width: 1280px;
   margin: 0 auto;
   padding: 0 32px;
   display: flex;
   align-items: center;
   justify-content: space-between;
+}
+.app-layout {
+  min-height: 100vh;
+  padding-top: var(--topbar-height);
 }
 .brand {
   display: inline-flex;
@@ -931,13 +940,18 @@ h2 {
 }
 
 @media (max-width: 560px) {
+  :root {
+    --topbar-height: 68px;
+  }
+
   .topbar-inner,
   .main-content {
     padding-left: 20px;
     padding-right: 20px;
   }
   .topbar-inner {
-    height: 68px;
+    height: var(--topbar-height);
+    min-height: var(--topbar-height);
   }
   .brand-symbol {
     width: 22px;

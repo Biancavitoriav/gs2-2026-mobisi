@@ -176,10 +176,10 @@ function EvaluationRoute() {
 
 function AppLayout() {
   return (
-    <>
+    <div className="app-layout">
       <Header />
       <Outlet />
-    </>
+    </div>
   );
 }
 
