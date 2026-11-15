@@ -1,4 +1,5 @@
 import PlaceCard from "../components/PlaceCard";
+import ApiLoading from "../components/ApiLoading";
 
 export default function HomePage({
   query,
@@ -48,8 +49,8 @@ export default function HomePage({
           </div>
         </div>
         {loading ? (
-          <div className="page-state">
-            <p>Carregando lugares…</p>
+          <div className="page-state loading-state">
+            <ApiLoading message="Carregando lugares…" />
           </div>
         ) : error ? (
           <div className="empty-state error-state">

@@ -15,6 +15,7 @@ import { MobisiProvider, useMobisi } from "./context/MobisiContext";
 import HomePage from "./pages/HomePage";
 import PlaceDetailsPage from "./pages/PlaceDetailsPage";
 import EvaluationPage from "./pages/EvaluationPage";
+import ApiLoading from "./components/ApiLoading";
 
 function HomeRoute() {
   const navigate = useNavigate();
@@ -87,10 +88,10 @@ function PlaceRoute() {
     };
   }, [placeId]);
 
-  if (loading && !place)
+  if (loading)
     return (
-      <main className="page-state">
-        <p>Carregando detalhes do local…</p>
+      <main className="page-state loading-state">
+        <ApiLoading message="Carregando detalhes do local…" />
       </main>
     );
   if (error && !place)
@@ -151,10 +152,17 @@ function EvaluationRoute() {
     }
   };
 
-  if (questionsLoading || !questions.length)
+  if (questionsLoading)
+    return (
+      <main className="page-state loading-state">
+        <ApiLoading message="Carregando perguntas…" />
+      </main>
+    );
+
+  if (questionsError || !questions.length)
     return (
       <main className="page-state">
-        <p>{questionsError || "Carregando perguntas…"}</p>
+        <p>{questionsError || "Nenhuma pergunta disponível no momento."}</p>
         {questionsError && (
           <button type="button" onClick={loadQuestions}>
             Tentar novamente

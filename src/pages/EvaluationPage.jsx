@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { ApiLoadingImage } from "../components/ApiLoading";
 
 export default function EvaluationPage({
   place,
@@ -80,7 +81,11 @@ export default function EvaluationPage({
               Descartar
             </button>
             <button type="submit" className="submit-button" disabled={submitting}>
-              <i className="bx bx-send" aria-hidden="true" />{" "}
+              {submitting ? (
+                <ApiLoadingImage className="api-loading-gif--inline" />
+              ) : (
+                <i className="bx bx-send" aria-hidden="true" />
+              )}{" "}
               {submitting ? "Enviando…" : "Submeter avaliação"}
             </button>
           </div>
