@@ -1,4 +1,3 @@
-import { SearchIcon } from "../components/Icons";
 import PlaceCard from "../components/PlaceCard";
 
 export default function HomePage({
@@ -27,7 +26,7 @@ export default function HomePage({
           <h2 id="places-title">Lugares para você</h2>
           <div className="filters" role="search">
             <label className="search-box">
-              <SearchIcon />
+              <i className="bx bx-search" aria-hidden="true" />
               <span className="sr-only">Pesquisar lugar</span>
               <input
                 value={query}

@@ -1,4 +1,3 @@
-import { HeartIcon } from "./Icons";
 import PlaceImage from "./PlaceImage";
 import StarRating from "./StarRating";
 
@@ -42,7 +41,10 @@ export default function PlaceCard({
               onToggleFavorite(place.id);
             }}
           >
-            <HeartIcon filled={favorite} />
+            <i
+              className={`${favorite ? "bxf" : "bx"} bx-heart`}
+              aria-hidden="true"
+            />
           </button>
           <button
             type="button"

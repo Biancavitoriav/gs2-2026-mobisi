@@ -1,11 +1,4 @@
 import { mapAccessibilityGroups } from "../data/accessibility";
-import {
-  ArrowLeftIcon,
-  GlobeIcon,
-  HeartIcon,
-  PhoneIcon,
-  PinIcon,
-} from "../components/Icons";
 import PlaceImage from "../components/PlaceImage";
 import { Stars } from "../components/StarRating";
 
@@ -14,17 +7,23 @@ function LocalInfo({ place }) {
     <div className="local-info info-panel">
       <h3>Informações do local</h3>
       <div className="contact-row">
-        <PhoneIcon />
+        <span className="info-icon">
+          <i className="bx bx-phone" aria-hidden="true" />
+        </span>
         <span>Telefone</span>
         <strong>{place.phone || "Não informado"}</strong>
       </div>
       <div className="contact-row">
-        <PinIcon />
+        <span className="info-icon">
+          <i className="bx bx-location-pin" aria-hidden="true" />
+        </span>
         <span>Categoria</span>
         <strong>{place.tag || "Não informada"}</strong>
       </div>
       <div className="contact-row">
-        <GlobeIcon />
+        <span className="info-icon">
+          <i className="bx bx-globe" aria-hidden="true" />
+        </span>
         <span>Website</span>
         {place.website ? (
           <a href={place.website} target="_blank" rel="noreferrer">
@@ -141,7 +140,7 @@ export default function PlaceDetailsPage({
   return (
     <main className="details-page">
       <button type="button" className="back-link" onClick={onBack}>
-        <ArrowLeftIcon />
+        <i className="bx bx-arrow-left" aria-hidden="true" />
         Voltar
       </button>
       <section className="detail-overview" aria-labelledby="detail-title">
@@ -157,7 +156,10 @@ export default function PlaceDetailsPage({
               className={`detail-favorite ${favorite ? "active" : ""}`}
               onClick={() => onToggleFavorite(place.id)}
             >
-              <HeartIcon filled={favorite} />
+              <i
+                className={`${favorite ? "bxf" : "bx"} bx-heart`}
+                aria-hidden="true"
+              />
               {favorite ? "Favoritado" : "Favoritar"}
             </button>
           </div>

@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { ArrowLeftIcon } from "../components/Icons";
 
 export default function EvaluationPage({
   place,
@@ -16,7 +15,7 @@ export default function EvaluationPage({
   return (
     <main className="evaluation-page">
       <button type="button" className="evaluation-back" onClick={onBack}>
-        <ArrowLeftIcon />
+        <i className="bx bx-arrow-left" aria-hidden="true" />
         Voltar e descartar avaliação
       </button>
       <header className="evaluation-heading">
