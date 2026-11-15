@@ -8,7 +8,7 @@ export default defineConfig({
     proxy: {
       "/api/mobisi": {
         target:
-          "https://mobisi-qradw6w97-vicentestramantinos-projects.vercel.app",
+          "https://mobisi-api.vercel.app",
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api\/mobisi/, "/api/v1"),
       },
