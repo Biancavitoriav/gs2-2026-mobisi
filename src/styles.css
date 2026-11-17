@@ -94,25 +94,6 @@ input:focus-visible,
   height: auto;
   object-fit: contain;
 }
-.profile-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 11px;
-  min-height: 44px;
-  font-size: 15px;
-  font-weight: 700;
-}
-.profile-avatar {
-  display: grid;
-  width: 36px;
-  height: 36px;
-  place-items: center;
-  border-radius: 50%;
-  background: #fff;
-  color: var(--blue-dark);
-  font-weight: 800;
-}
-
 .main-content {
   max-width: 1280px;
   margin: 0 auto;
@@ -722,7 +703,7 @@ h2 {
 }
 .criteria-grid {
   display: grid;
-  grid-template-columns: minmax(280px, 520px);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 16px;
 }
 .criterion-card {
@@ -764,6 +745,10 @@ h2 {
   background: #ffe2e2;
   color: #bd5454;
 }
+.status-pill.not-rated {
+  background: #eef0f1;
+  color: #656b6e;
+}
 .criterion-card p {
   display: flex;
   align-items: center;
@@ -777,6 +762,11 @@ h2 {
 }
 .criterion-card p:last-child {
   margin-bottom: 0;
+}
+.criteria-empty {
+  margin: 0;
+  color: #6c6865;
+  font-size: 13px;
 }
 .bullet {
   display: inline-block;
@@ -1004,14 +994,6 @@ h2 {
   }
   .brand-wordmark {
     width: 73px;
-  }
-  .profile-chip {
-    gap: 7px;
-    font-size: 12px;
-  }
-  .profile-avatar {
-    width: 28px;
-    height: 28px;
   }
   .main-content {
     padding-top: 40px;

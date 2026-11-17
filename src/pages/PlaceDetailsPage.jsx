@@ -68,11 +68,94 @@ function AccessibilitySummary({ groups }) {
   );
 }
 
+function ResponseLines({ item, showTotal = false }) {
+  const total = item.sim + item.nao + item.naoSei;
+  const responseCount = Number(item.responseCount) || 0;
+  const responseLabel = (count, answer) =>
+    showTotal && responseCount > 0
+      ? count + " de " + responseCount + " responderam que “" + answer + "”"
+      : count + " responderam “" + answer + "”";
+
+  if (total === 0 && responseCount === 0) {
+    return (
+      <p>
+        <span className="bullet bullet-2" />
+        Ainda não há respostas registradas
+      </p>
+    );
+  }
+
+  if (total === 0) {
+    return (
+      <p>
+        <span className="bullet bullet-2" />
+        {responseCount}{" "}
+        {responseCount === 1
+          ? "avaliação registrada"
+          : "avaliações registradas"}
+        , mas o resumo das respostas ainda não está disponível
+      </p>
+    );
+  }
+
+  return (
+    <>
+      <p>
+        <span className="bullet" />
+        {responseLabel(item.sim, "Sim")}
+      </p>
+      <p>
+        <span className="bullet bullet-1" />
+        {responseLabel(item.nao, "Não")}
+      </p>
+      <p>
+        <span className="bullet bullet-2" />
+        {showTotal && responseCount > 0
+          ? item.naoSei +
+            " de " +
+            responseCount +
+            " responderam que “Não sei”"
+          : item.naoSei + " responderam “Não sei”"}
+        {item.percentage != null
+          ? " · " + Number(item.percentage).toFixed(0) + "%"
+          : ""}
+      </p>
+    </>
+  );
+}
+
+function CriterionCard({ item, showTotal }) {
+  return (
+    <div className="criterion-card">
+      <div className="criterion-heading">
+        <strong>{item.title || "Resumo das respostas"}</strong>
+        <span className={"status-pill " + item.statusClass}>
+          {item.statusLabel}
+        </span>
+      </div>
+      <ResponseLines item={item} showTotal={showTotal} />
+    </div>
+  );
+}
+
 function DetailGroup({ group }) {
-  const total = group.sim + group.nao + group.naoSei;
-  const percentage =
-    group.percentage == null ? null : `${Number(group.percentage).toFixed(0)}%`;
-  const responseCount = Number(group.responseCount) || 0;
+  const criteria = group.criteria.length
+    ? group.criteria
+    : group.hasHistoricalData
+      ? []
+      : [
+        {
+          title: "Resumo das respostas",
+          statusClass: group.statusClass,
+          statusLabel: group.statusLabel,
+          percentage: group.percentage,
+          sim: group.sim,
+          nao: group.nao,
+          naoSei: group.naoSei,
+          responseCount: group.responseCount,
+        },
+      ];
+
   return (
     <section className="accessibility-group">
       <h3>
@@ -81,53 +164,28 @@ function DetailGroup({ group }) {
         </span>
         {group.title}
       </h3>
-      <div className="criteria-grid">
-        <div className="criterion-card">
-          <div className="criterion-heading">
-            <strong>Resumo das respostas</strong>
-            <span className={`status-pill ${group.statusClass}`}>
-              {group.statusLabel}
-            </span>
-          </div>
-          {total === 0 && responseCount === 0 ? (
-            <p>
-              <span className="bullet bullet-2" />
-              Ainda não há respostas registradas
-            </p>
-          ) : total === 0 ? (
-            <p>
-              <span className="bullet bullet-2" />
-              {responseCount}{" "}
-              {responseCount === 1
-                ? "avaliação registrada"
-                : "avaliações registradas"}
-              , mas o resumo das respostas ainda não está disponível
-            </p>
-          ) : (
-            <>
-              <p>
-                <span className="bullet" />
-                {group.sim} responderam “Sim”
-              </p>
-              <p>
-                <span className="bullet bullet-1" />
-                {group.nao} responderam “Não”
-              </p>
-              <p>
-                <span className="bullet bullet-2" />
-                {group.naoSei} responderam “Não sei”
-                {percentage ? ` · ${percentage}` : ""}
-              </p>
-            </>
-          )}
+      {criteria.length > 0 ? (
+        <div className="criteria-grid">
+          {criteria.map((criterion, index) => (
+            <CriterionCard
+              key={group.code + "-" + index}
+              item={criterion}
+              showTotal={criteria.length > 1}
+            />
+          ))}
         </div>
-      </div>
+      ) : (
+        <p className="criteria-empty">
+          Ainda não há histórico detalhado para esta categoria.
+        </p>
+      )}
     </section>
   );
 }
 
 export default function PlaceDetailsPage({
   place,
+  questionGroups = [],
   favorite,
   onToggleFavorite,
   onBack,
@@ -136,6 +194,8 @@ export default function PlaceDetailsPage({
   const accessibilityGroups = mapAccessibilityGroups(
     place.accessibility,
     place.reviews,
+    place.historicalAccessibility,
+    questionGroups,
   );
   return (
     <main className="details-page">

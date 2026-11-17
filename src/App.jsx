@@ -62,7 +62,13 @@ function HomeRoute() {
 function PlaceRoute() {
   const { placeId } = useParams();
   const navigate = useNavigate();
-  const { favorites, toggleFavorite, places } = useMobisi();
+  const {
+    favorites,
+    toggleFavorite,
+    places,
+    questions,
+    loadQuestions,
+  } = useMobisi();
   const [place, setPlace] = useState(
     () => places.find((item) => item.id === Number(placeId)) || null,
   );
@@ -88,6 +94,10 @@ function PlaceRoute() {
     };
   }, [placeId]);
 
+  useEffect(() => {
+    loadQuestions();
+  }, [loadQuestions]);
+
   if (loading)
     return (
       <main className="page-state loading-state">
@@ -108,6 +118,7 @@ function PlaceRoute() {
   return (
     <PlaceDetailsPage
       place={place}
+      questionGroups={questions}
       favorite={favorites.has(place.id)}
       onToggleFavorite={toggleFavorite}
       onBack={() => navigate("/")}

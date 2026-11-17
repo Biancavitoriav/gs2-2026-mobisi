@@ -15,12 +15,6 @@ export default function Header() {
           />
           <img className="brand-wordmark" src={logoMobisi} alt="Mobisi" />
         </Link>
-        <div className="profile-chip">
-          <span className="profile-avatar" aria-hidden="true">
-            V
-          </span>
-          <span>Vicente Souza</span>
-        </div>
       </div>
     </header>
   );
