@@ -38,8 +38,7 @@ button {
 }
 button:focus-visible,
 a:focus-visible,
-input:focus-visible,
-.place-card:focus-visible {
+input:focus-visible {
   outline: 3px solid rgba(7, 91, 145, 0.32);
   outline-offset: 3px;
 }
@@ -222,6 +221,10 @@ h2 {
 }
 .toggle-control input:checked + .toggle span {
   transform: translateX(22px);
+}
+.toggle-control input:focus-visible + .toggle {
+  outline: 3px solid rgba(7, 91, 145, 0.32);
+  outline-offset: 3px;
 }
 
 .places-grid {
@@ -537,6 +540,7 @@ h2 {
 .accessibility-summary {
   padding: 20px;
 }
+.info-panel h2,
 .info-panel h3 {
   margin: 0 0 14px;
   color: #211712;
@@ -865,9 +869,23 @@ h2 {
 .evaluation-section li::marker {
   font-weight: 700;
 }
-.evaluation-section li p {
+.question-fieldset {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  color: var(--ink);
+  font-size: 15px;
+  line-height: 1.5;
+}
+.question-fieldset legend {
+  max-width: 100%;
   margin: 0 0 12px;
+  padding: 0;
   font-weight: 600;
+}
+.answer-option input:focus-visible + .radio-control {
+  outline: 3px solid rgba(7, 91, 145, 0.32);
+  outline-offset: 3px;
 }
 .answer-options {
   display: flex;
@@ -1064,5 +1082,16 @@ h2 {
   .discard-button,
   .submit-button {
     flex: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
   }
 }

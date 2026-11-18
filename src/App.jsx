@@ -124,7 +124,7 @@ function PlaceRoute() {
     );
   if (error && !place)
     return (
-      <main className="page-state error-state">
+      <main className="page-state error-state" role="alert">
         <h1>Não foi possível carregar este local</h1>
         <p>{error}</p>
         <button type="button" onClick={() => navigate("/")}>

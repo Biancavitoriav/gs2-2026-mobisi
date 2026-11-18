@@ -4,8 +4,8 @@ import { Stars } from "../components/StarRating";
 
 function LocalInfo({ place }) {
   return (
-    <div className="local-info info-panel">
-      <h3>Informações do local</h3>
+    <section className="local-info info-panel" aria-labelledby="local-info-title">
+      <h2 id="local-info-title">Informações do local</h2>
       <div className="contact-row">
         <span className="info-icon">
           <i className="bx bx-phone" aria-hidden="true" />
@@ -26,21 +26,29 @@ function LocalInfo({ place }) {
         </span>
         <span>Website</span>
         {place.website ? (
-          <a href={place.website} target="_blank" rel="noreferrer">
+          <a
+            href={place.website}
+            target="_blank"
+            rel="noreferrer"
+            aria-label={`Acessar o site de ${place.name} em uma nova aba`}
+          >
             Acessar site
           </a>
         ) : (
           <strong>Não informado</strong>
         )}
       </div>
-    </div>
+    </section>
   );
 }
 
 function AccessibilitySummary({ groups }) {
   return (
-    <div className="accessibility-summary info-panel">
-      <h3>Acessibilidade</h3>
+    <section
+      className="accessibility-summary info-panel"
+      aria-labelledby="accessibility-summary-title"
+    >
+      <h2 id="accessibility-summary-title">Acessibilidade</h2>
       <div className="summary-grid">
         {groups.map((group) => (
           <div key={group.code}>
@@ -64,7 +72,7 @@ function AccessibilitySummary({ groups }) {
           </div>
         ))}
       </div>
-    </div>
+    </section>
   );
 }
 
@@ -216,6 +224,12 @@ export default function PlaceDetailsPage({
             <button
               type="button"
               className={`detail-favorite ${favorite ? "active" : ""}`}
+              aria-label={
+                favorite
+                  ? `Remover ${place.name} dos favoritos`
+                  : `Adicionar ${place.name} aos favoritos`
+              }
+              aria-pressed={favorite}
               onClick={() => onToggleFavorite(place.id)}
             >
               <i
@@ -231,7 +245,7 @@ export default function PlaceDetailsPage({
           </div>
           <div className="detail-rating info-panel">
             <div>
-              <h3>Avaliação</h3>
+              <h2>Avaliação</h2>
               <div className="detail-rating-line">
                 <strong>{place.rating}</strong>
                 <Stars rating={place.rating} />
@@ -244,12 +258,17 @@ export default function PlaceDetailsPage({
           </div>
         </div>
       </section>
-      <div className="details-title">Detalhes das avaliações</div>
-      <div className="accessibility-groups">
+      <h2 className="details-title" id="details-title">
+        Detalhes das avaliações
+      </h2>
+      <section
+        className="accessibility-groups"
+        aria-labelledby="details-title"
+      >
         {accessibilityGroups.map((group) => (
           <DetailGroup key={group.code} group={group} />
         ))}
-      </div>
+      </section>
     </main>
   );
 }

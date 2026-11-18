@@ -30,6 +30,7 @@ export default function StarRating({ rating, reviews }) {
   return (
     <div
       className="rating"
+      role="img"
       aria-label={`${rating} de 5 estrelas, ${reviews} avaliações`}
     >
       <Stars rating={rating} />

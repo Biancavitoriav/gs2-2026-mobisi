@@ -28,6 +28,7 @@ export default function EvaluationPage({
           </p>
         </header>
         <form
+          aria-busy={submitting}
           onSubmit={(event) => {
             event.preventDefault();
             onSubmit(answers);
@@ -47,23 +48,25 @@ export default function EvaluationPage({
                     const key = question.id;
                     return (
                       <li key={question.id}>
-                        <p>{question.text}</p>
-                        <div className="answer-options">
-                          {["Sim", "Não", "Não sei"].map((answer) => (
-                            <label key={answer} className="answer-option">
-                              <input
-                                type="radio"
-                                name={key}
-                                value={answer}
-                                required
-                                checked={answers[key] === answer}
-                                onChange={() => updateAnswer(key, answer)}
-                              />
-                              <span className="radio-control" />
-                              {answer}
-                            </label>
-                          ))}
-                        </div>
+                        <fieldset className="question-fieldset">
+                          <legend>{question.text}</legend>
+                          <div className="answer-options">
+                            {["Sim", "Não", "Não sei"].map((answer) => (
+                              <label key={answer} className="answer-option">
+                                <input
+                                  type="radio"
+                                  name={key}
+                                  value={answer}
+                                  required
+                                  checked={answers[key] === answer}
+                                  onChange={() => updateAnswer(key, answer)}
+                                />
+                                <span className="radio-control" />
+                                {answer}
+                              </label>
+                            ))}
+                          </div>
+                        </fieldset>
                       </li>
                     );
                   })}
@@ -86,7 +89,9 @@ export default function EvaluationPage({
               ) : (
                 <i className="bx bx-send" aria-hidden="true" />
               )}{" "}
-              {submitting ? "Enviando…" : "Submeter avaliação"}
+              <span aria-live="polite">
+                {submitting ? "Enviando…" : "Submeter avaliação"}
+              </span>
             </button>
           </div>
         </form>

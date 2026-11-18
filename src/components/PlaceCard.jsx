@@ -11,11 +11,6 @@ export default function PlaceCard({
     <article
       className="place-card"
       onClick={() => onOpen(place)}
-      onKeyDown={(event) => {
-        if (event.key === "Enter" || event.key === " ") onOpen(place);
-      }}
-      role="button"
-      tabIndex="0"
     >
       <div className="place-image-wrap">
         <PlaceImage place={place} className="place-image" />

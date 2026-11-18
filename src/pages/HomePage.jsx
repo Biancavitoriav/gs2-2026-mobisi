@@ -25,7 +25,11 @@ export default function HomePage({
       <section className="places-section" aria-labelledby="places-title">
         <div className="section-heading">
           <h2 id="places-title">Lugares para você</h2>
-          <div className="filters" role="search">
+          <div
+            className="filters"
+            role="search"
+            aria-label="Buscar e filtrar lugares"
+          >
             <label className="search-box">
               <i className="bx bx-search" aria-hidden="true" />
               <span className="sr-only">Pesquisar lugar</span>
@@ -33,6 +37,7 @@ export default function HomePage({
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
                 placeholder="Pesquisar lugar"
+                aria-label="Pesquisar por nome ou endereço"
               />
             </label>
             <label className="toggle-control">
@@ -41,6 +46,7 @@ export default function HomePage({
                 type="checkbox"
                 checked={onlyFavorites}
                 onChange={(event) => setOnlyFavorites(event.target.checked)}
+                aria-label="Mostrar apenas lugares favoritos"
               />
               <span className="toggle" aria-hidden="true">
                 <span />
@@ -53,7 +59,7 @@ export default function HomePage({
             <ApiLoading message="Carregando lugares…" />
           </div>
         ) : error ? (
-          <div className="empty-state error-state">
+          <div className="empty-state error-state" role="alert">
             <h3>Não foi possível carregar os lugares</h3>
             <p>{error}</p>
             <button type="button" onClick={onRetry}>
