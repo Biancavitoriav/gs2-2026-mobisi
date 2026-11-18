@@ -186,6 +186,7 @@ function DetailGroup({ group }) {
 export default function PlaceDetailsPage({
   place,
   questionGroups = [],
+  reviewData,
   favorite,
   onToggleFavorite,
   onBack,
@@ -196,6 +197,7 @@ export default function PlaceDetailsPage({
     place.reviews,
     place.historicalAccessibility,
     questionGroups,
+    reviewData,
   );
   return (
     <main className="details-page">

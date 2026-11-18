@@ -10,7 +10,7 @@ import {
 } from "react-router-dom";
 import Header from "./components/Header";
 import { mapPlaceDetails } from "./data/places";
-import { createReview, getPlace } from "./services/api";
+import { createReview, getPlace, listPlaceReviews } from "./services/api";
 import { MobisiProvider, useMobisi } from "./context/MobisiContext";
 import HomePage from "./pages/HomePage";
 import PlaceDetailsPage from "./pages/PlaceDetailsPage";
@@ -72,6 +72,7 @@ function PlaceRoute() {
   const [place, setPlace] = useState(
     () => places.find((item) => item.id === Number(placeId)) || null,
   );
+  const [reviewData, setReviewData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -98,6 +99,23 @@ function PlaceRoute() {
     loadQuestions();
   }, [loadQuestions]);
 
+  useEffect(() => {
+    let active = true;
+
+    listPlaceReviews(placeId)
+      .then((data) => {
+        if (active) setReviewData(data);
+      })
+      .catch(() => {
+        // The place summary remains a safe fallback when the detail endpoint
+        // is unavailable.
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [placeId]);
+
   if (loading)
     return (
       <main className="page-state loading-state">
@@ -119,6 +137,7 @@ function PlaceRoute() {
     <PlaceDetailsPage
       place={place}
       questionGroups={questions}
+      reviewData={reviewData}
       favorite={favorites.has(place.id)}
       onToggleFavorite={toggleFavorite}
       onBack={() => navigate("/")}

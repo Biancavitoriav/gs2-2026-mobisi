@@ -48,6 +48,57 @@ export function getAccessibilityQuestions() {
   return request("/acessibilidade/perguntas");
 }
 
+function getReviewItems(data) {
+  if (Array.isArray(data)) return data;
+  return (
+    data?.avaliacoes ||
+    data?.itens ||
+    data?.items ||
+    data?.data?.avaliacoes ||
+    data?.data?.itens ||
+    data?.data?.items ||
+    []
+  );
+}
+
+function getReviewTotal(data) {
+  return Number(
+    data?.total ??
+      data?.total_avaliacoes ??
+      data?.pagination?.total ??
+      data?.paginacao?.total ??
+      data?.data?.total ??
+      0,
+  );
+}
+
+export async function listPlaceReviews(localId, { page = 1, limit = 20 } = {}) {
+  const params = new URLSearchParams({ pagina: page, limite: limit });
+  const firstPage = await request(`/locais/${localId}/avaliacoes?${params}`);
+  const firstItems = getReviewItems(firstPage);
+  const total = getReviewTotal(firstPage);
+  const pageCount = total > 0 ? Math.ceil(total / limit) : 1;
+
+  if (pageCount <= page || firstItems.length >= total) return firstPage;
+
+  const remainingPages = await Promise.all(
+    Array.from({ length: pageCount - page }, (_, index) => {
+      const nextPage = page + index + 1;
+      return request(
+        `/locais/${localId}/avaliacoes?pagina=${nextPage}&limite=${limit}`,
+      );
+    }),
+  );
+
+  return {
+    ...firstPage,
+    avaliacoes: [
+      ...firstItems,
+      ...remainingPages.flatMap(getReviewItems),
+    ],
+  };
+}
+
 export function createReview(localId, respostas) {
   return request(`/locais/${localId}/avaliacoes`, {
     method: "POST",

@@ -258,6 +258,179 @@ function normalizeText(value) {
     .toLowerCase();
 }
 
+function getReviewItems(data) {
+  if (Array.isArray(data)) return data;
+
+  const items =
+    data?.avaliacoes ||
+    data?.itens ||
+    data?.items ||
+    data?.data?.avaliacoes ||
+    data?.data?.itens ||
+    data?.data?.items;
+
+  return Array.isArray(items) ? items : [];
+}
+
+function getReviewTotal(data, reviews) {
+  const sources = [data, data?.pagination, data?.paginacao, data?.data];
+  const aliases = [
+    "total",
+    "total_avaliacoes",
+    "quantidade",
+    "total_itens",
+    "totalItems",
+  ];
+
+  for (const source of sources) {
+    for (const alias of aliases) {
+      const value = asNumber(source?.[alias]);
+      if (value !== null) return value;
+    }
+  }
+
+  return reviews.length;
+}
+
+function getReviewAnswers(review) {
+  const answers = review?.respostas || review?.responses || review?.answers;
+  return Array.isArray(answers) ? answers : [];
+}
+
+function getAnswerQuestionKey(answer) {
+  const questionId =
+    answer?.pergunta_id ??
+    answer?.question_id ??
+    answer?.id_pergunta ??
+    answer?.pergunta?.id ??
+    answer?.question?.id;
+  if (questionId !== null && questionId !== undefined) {
+    return `id:${questionId}`;
+  }
+
+  const questionText =
+    typeof answer?.pergunta === "string"
+      ? answer.pergunta
+      : answer?.pergunta?.texto ||
+        answer?.pergunta?.pergunta ||
+        answer?.question?.texto ||
+        answer?.question?.text;
+
+  return questionText ? `text:${normalizeText(questionText)}` : null;
+}
+
+function normalizeAnswer(value) {
+  const answer = normalizeText(value).replace(/_/g, " ").trim();
+  if (answer === "sim") return "sim";
+  if (answer === "nao") return "nao";
+  if (answer === "nao sei") return "naoSei";
+  return null;
+}
+
+function getStatusForCounts(sim, nao, naoSei, responseCount) {
+  if (!responseCount) return "NAO_AVALIADA";
+
+  const positiveRate = sim / responseCount;
+  if (positiveRate >= 0.8) return "ACESSIVEL";
+  if (positiveRate >= 0.5) return "PARCIAL";
+  return nao > 0 || naoSei > 0 ? "PRECISA_MELHORAR" : "NAO_AVALIADA";
+}
+
+function getStatusClass(status) {
+  return status === "ACESSIVEL"
+    ? "accessible"
+    : status === "PARCIAL"
+      ? "partial"
+      : status === "PRECISA_MELHORAR"
+        ? "needs-work"
+        : "not-rated";
+}
+
+function mapReviewGroups(reviewData, questionGroups) {
+  const reviews = getReviewItems(reviewData);
+  const totalReviews = getReviewTotal(reviewData, reviews);
+  const countsByQuestion = new Map();
+
+  questionGroups.forEach((group) => {
+    group.questions.forEach((question) => {
+      const counts = {
+        sim: 0,
+        nao: 0,
+        naoSei: 0,
+      };
+      countsByQuestion.set(`id:${question.id}`, counts);
+      countsByQuestion.set(`text:${normalizeText(question.text)}`, counts);
+    });
+  });
+
+  reviews.flatMap(getReviewAnswers).forEach((answer) => {
+    const key = getAnswerQuestionKey(answer);
+    const response = normalizeAnswer(
+      answer?.resposta ?? answer?.response ?? answer?.answer,
+    );
+    const counts = key ? countsByQuestion.get(key) : null;
+    if (counts && response) counts[response] += 1;
+  });
+
+  return questionGroups.map((group) => {
+    const criteria = group.questions.map((question) => {
+      const counts = countsByQuestion.get(`id:${question.id}`) || {
+        sim: 0,
+        nao: 0,
+        naoSei: 0,
+      };
+      const status = getStatusForCounts(
+        counts.sim,
+        counts.nao,
+        counts.naoSei,
+        totalReviews,
+      );
+
+      return {
+        title: question.shortTitle || question.text,
+        status,
+        statusLabel: statusLabels[status] || "Não avaliada",
+        statusClass: getStatusClass(status),
+        sim: counts.sim,
+        nao: counts.nao,
+        naoSei: counts.naoSei,
+        responseCount: totalReviews,
+        hasResponseData: counts.sim + counts.nao + counts.naoSei > 0,
+      };
+    });
+    const totals = criteria.reduce(
+      (summary, criterion) => ({
+        sim: summary.sim + criterion.sim,
+        nao: summary.nao + criterion.nao,
+        naoSei: summary.naoSei + criterion.naoSei,
+      }),
+      { sim: 0, nao: 0, naoSei: 0 },
+    );
+    const status = getStatusForCounts(
+      totals.sim,
+      totals.nao,
+      totals.naoSei,
+      totalReviews * Math.max(criteria.length, 1),
+    );
+
+    return {
+      code: group.code,
+      title: group.title || accessibilityGroupMeta[group.code]?.title,
+      icon: group.icon || accessibilityGroupMeta[group.code]?.icon,
+      color: accessibilityGroupMeta[group.code]?.color || "#075b91",
+      criteria,
+      status,
+      statusLabel: statusLabels[status] || "Não avaliada",
+      statusClass: getStatusClass(status),
+      sim: totals.sim,
+      nao: totals.nao,
+      naoSei: totals.naoSei,
+      responseCount: totalReviews,
+      hasHistoricalData: totalReviews > 0,
+    };
+  });
+}
+
 function findHistoricalCriterion(question, historicalItems) {
   const questionText = normalizeText(question.text);
   const historyEntries = normalizeCriteria(historicalItems);
@@ -421,7 +594,12 @@ export function mapAccessibilityGroups(
   totalReviews = 0,
   historicalItems = {},
   questionGroups = [],
+  reviewData = null,
 ) {
+  if (reviewData && questionGroups.length) {
+    return mapReviewGroups(reviewData, questionGroups);
+  }
+
   return normalizeItems(items).map((item) => {
     const code = item.dimensao;
     const sim = getResponseValue(item, responseAliases.sim);
