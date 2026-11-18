@@ -41,27 +41,18 @@ const statusLabels = {
   NAO_AVALIADA: "Não avaliada",
 };
 
+const statusClasses = {
+  ACESSIVEL: "accessible",
+  PARCIAL: "partial",
+  PRECISA_MELHORAR: "needs-work",
+  NAO_AVALIADA: "not-rated",
+};
+
 const responseAliases = {
-  sim: ["sim", "Sim", "SIM", "sim_count", "quantidade_sim", "total_sim"],
-  nao: [
-    "nao",
-    "não",
-    "Nao",
-    "Não",
-    "NAO",
-    "NÃO",
-    "nao_count",
-    "quantidade_nao",
-    "total_nao",
-  ],
+  sim: ["sim", "sim_count", "quantidade_sim", "total_sim"],
+  nao: ["nao", "nao_count", "quantidade_nao", "total_nao"],
   naoSei: [
     "nao_sei",
-    "não_sei",
-    "Nao_sei",
-    "Não_sei",
-    "Não sei",
-    "NAO_SEI",
-    "NÃO_SEI",
     "naoSei",
     "nao_sei_count",
     "quantidade_nao_sei",
@@ -75,6 +66,14 @@ const responseContainers = [
   "contagem",
   "contagens",
   "respostas_por_opcao",
+];
+
+const responseTotalAliases = [
+  "total_respostas",
+  "total_respostas_registradas",
+  "total",
+  "quantidade_respostas",
+  "respostas_count",
 ];
 
 const criteriaContainers = [
@@ -141,16 +140,8 @@ function getResponseValue(item, aliases) {
 }
 
 function getResponseCount(item, sim, nao, naoSei, fallbackCount) {
-  const totalAliases = [
-    "total_respostas",
-    "total_respostas_registradas",
-    "total",
-    "quantidade_respostas",
-    "respostas_count",
-  ];
-
   for (const source of getResponseSources(item)) {
-    for (const alias of totalAliases) {
+    for (const alias of responseTotalAliases) {
       const value = asNumber(source[alias]);
       if (value !== null) return value;
     }
@@ -200,7 +191,8 @@ function getCriteriaContainer(item) {
 function findHistoricalGroup(historicalItems, code) {
   if (Array.isArray(historicalItems)) {
     return historicalItems.filter(
-      (item) => item?.dimensao === code || item?.codigo === code,
+      (item) =>
+        item?.dimensao === code || item?.codigo === code,
     );
   }
 
@@ -251,13 +243,6 @@ function inferStatus(item, sim, nao, naoSei) {
   return "ACESSIVEL";
 }
 
-function normalizeText(value) {
-  return String(value || "")
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .toLowerCase();
-}
-
 function getReviewItems(data) {
   if (Array.isArray(data)) return data;
 
@@ -273,7 +258,6 @@ function getReviewItems(data) {
 }
 
 function getReviewTotal(data, reviews) {
-  const sources = [data, data?.pagination, data?.paginacao, data?.data];
   const aliases = [
     "total",
     "total_avaliacoes",
@@ -281,6 +265,8 @@ function getReviewTotal(data, reviews) {
     "total_itens",
     "totalItems",
   ];
+
+  const sources = [data, data?.pagination, data?.paginacao, data?.data];
 
   for (const source of sources) {
     for (const alias of aliases) {
@@ -316,14 +302,17 @@ function getAnswerQuestionKey(answer) {
         answer?.question?.texto ||
         answer?.question?.text;
 
-  return questionText ? `text:${normalizeText(questionText)}` : null;
+  return questionText ? `text:${String(questionText).toLowerCase()}` : null;
 }
 
 function normalizeAnswer(value) {
-  const answer = normalizeText(value).replace(/_/g, " ").trim();
+  const answer = String(value || "")
+    .toLowerCase()
+    .replace(/_/g, " ")
+    .trim();
   if (answer === "sim") return "sim";
-  if (answer === "nao") return "nao";
-  if (answer === "nao sei") return "naoSei";
+  if (answer === "nao" || answer === "não") return "nao";
+  if (answer === "nao sei" || answer === "não sei") return "naoSei";
   return null;
 }
 
@@ -337,13 +326,15 @@ function getStatusForCounts(sim, nao, naoSei, responseCount) {
 }
 
 function getStatusClass(status) {
-  return status === "ACESSIVEL"
-    ? "accessible"
-    : status === "PARCIAL"
-      ? "partial"
-      : status === "PRECISA_MELHORAR"
-        ? "needs-work"
-        : "not-rated";
+  return statusClasses[status] || statusClasses.NAO_AVALIADA;
+}
+
+function getStatusInfo(status) {
+  return {
+    status,
+    statusLabel: statusLabels[status] || "Não avaliada",
+    statusClass: getStatusClass(status),
+  };
 }
 
 function mapReviewGroups(reviewData, questionGroups) {
@@ -359,7 +350,10 @@ function mapReviewGroups(reviewData, questionGroups) {
         naoSei: 0,
       };
       countsByQuestion.set(`id:${question.id}`, counts);
-      countsByQuestion.set(`text:${normalizeText(question.text)}`, counts);
+      countsByQuestion.set(
+        `text:${String(question.text || "").toLowerCase()}`,
+        counts,
+      );
     });
   });
 
@@ -388,9 +382,7 @@ function mapReviewGroups(reviewData, questionGroups) {
 
       return {
         title: question.shortTitle || question.text,
-        status,
-        statusLabel: statusLabels[status] || "Não avaliada",
-        statusClass: getStatusClass(status),
+        ...getStatusInfo(status),
         sim: counts.sim,
         nao: counts.nao,
         naoSei: counts.naoSei,
@@ -419,9 +411,7 @@ function mapReviewGroups(reviewData, questionGroups) {
       icon: group.icon || accessibilityGroupMeta[group.code]?.icon,
       color: accessibilityGroupMeta[group.code]?.color || "#075b91",
       criteria,
-      status,
-      statusLabel: statusLabels[status] || "Não avaliada",
-      statusClass: getStatusClass(status),
+      ...getStatusInfo(status),
       sim: totals.sim,
       nao: totals.nao,
       naoSei: totals.naoSei,
@@ -432,13 +422,13 @@ function mapReviewGroups(reviewData, questionGroups) {
 }
 
 function findHistoricalCriterion(question, historicalItems) {
-  const questionText = normalizeText(question.text);
+  const questionText = String(question.text || "").toLowerCase();
   const historyEntries = normalizeCriteria(historicalItems);
   let bestMatch = null;
   let bestScore = 0;
 
   historyEntries.forEach((entry) => {
-    const key = normalizeText(entry.criterionKey || entry.nome);
+    const key = String(entry.criterionKey || entry.nome || "").toLowerCase();
     const words = key.split(/[^a-z0-9]+/).filter((word) => word.length > 2);
     const matchedWords = words.filter((word) => questionText.includes(word));
     const score =
@@ -458,7 +448,10 @@ function findHistoricalCriterion(question, historicalItems) {
 }
 
 function getHistoricalCriterionMeta(key) {
-  return historicalCriterionMeta[normalizeText(key).replace(/[^a-z0-9]+/g, "_")];
+  const normalizedKey = String(key || "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "_");
+  return historicalCriterionMeta[normalizedKey];
 }
 
 function mapHistoricalCriteria(historicalItems, code, totalReviews) {
@@ -517,19 +510,11 @@ function mapCriterion(item, fallbackTitle, totalReviews, code, questionGroups) {
   const status = inferStatus(item, sim, nao, naoSei);
 
   return {
-    title: getCriterionTitle(item, null) ||
+    title:
+      getCriterionTitle(item, null) ||
       getQuestionTitle(item, code, questionGroups) ||
       fallbackTitle,
-    status,
-    statusLabel: statusLabels[status] || "Não avaliada",
-    statusClass:
-      status === "ACESSIVEL"
-        ? "accessible"
-        : status === "PARCIAL"
-          ? "partial"
-          : status === "PRECISA_MELHORAR"
-            ? "needs-work"
-            : "not-rated",
+    ...getStatusInfo(status),
     percentage: item.percentual,
     sim,
     nao,
@@ -537,6 +522,26 @@ function mapCriterion(item, fallbackTitle, totalReviews, code, questionGroups) {
     responseCount: getResponseCount(item, sim, nao, naoSei, totalReviews),
     hasResponseData: hasResponseData(item),
   };
+}
+
+function getCriteriaSource(item, historicalGroup) {
+  const itemCriteria = getCriteriaContainer(item);
+  if (itemCriteria) return itemCriteria;
+
+  const historicalCriteria = getCriteriaContainer(historicalGroup);
+  if (historicalCriteria) return historicalCriteria;
+
+  if (Array.isArray(historicalGroup)) return historicalGroup;
+
+  if (
+    historicalGroup &&
+    typeof historicalGroup === "object" &&
+    !hasResponseData(historicalGroup)
+  ) {
+    return historicalGroup;
+  }
+
+  return null;
 }
 
 function mapGroupCriteria(
@@ -547,46 +552,35 @@ function mapGroupCriteria(
   questionGroups,
 ) {
   const historicalGroup = findHistoricalGroup(historicalItems, code);
-  const source =
-    getCriteriaContainer(item) ||
-    getCriteriaContainer(historicalGroup) ||
-    (Array.isArray(historicalGroup)
-      ? historicalGroup
-      : historicalGroup &&
-          typeof historicalGroup === "object" &&
-          !hasResponseData(historicalGroup)
-        ? historicalGroup
-        : null);
-  const criteria = normalizeCriteria(source);
+  const criteria = normalizeCriteria(
+    getCriteriaSource(item, historicalGroup),
+  );
 
-  if (!criteria.length && historicalItems && typeof historicalItems === "object") {
+  if (criteria.length) {
+    return criteria.map((criterion, index) =>
+      mapCriterion(
+        criterion,
+        `Critério ${index + 1}`,
+        totalReviews,
+        code,
+        questionGroups,
+      ),
+    );
+  }
+
+  if (historicalItems && typeof historicalItems === "object") {
     const historicalCriteria = mapHistoricalCriteria(
       historicalItems,
       code,
       totalReviews,
     );
-    if (historicalCriteria.length) return historicalCriteria;
-    return [];
+    return historicalCriteria;
   }
 
-  if (!criteria.length) {
-    const questionGroup = questionGroups.find(
-      (group) => group.code === code,
-    );
-    if (questionGroup) {
-      return mapQuestionCriteria(questionGroup, historicalItems, totalReviews);
-    }
-  }
-
-  return criteria.map((criterion, index) =>
-    mapCriterion(
-      criterion,
-      `Critério ${index + 1}`,
-      totalReviews,
-      code,
-      questionGroups,
-    ),
-  );
+  const questionGroup = questionGroups.find((group) => group.code === code);
+  return questionGroup
+    ? mapQuestionCriteria(questionGroup, historicalItems, totalReviews)
+    : [];
 }
 
 export function mapAccessibilityGroups(
@@ -601,23 +595,26 @@ export function mapAccessibilityGroups(
   }
 
   return normalizeItems(items).map((item) => {
-    const code = item.dimensao;
+    const code = item.dimensao || item.codigo;
     const sim = getResponseValue(item, responseAliases.sim);
     const nao = getResponseValue(item, responseAliases.nao);
     const naoSei = getResponseValue(item, responseAliases.naoSei);
+    const status = item.status || inferStatus(item, sim, nao, naoSei);
 
     return {
       code,
       title:
-        item.nome ||
-        accessibilityGroupMeta[code]?.title ||
-        code,
+        item.nome || accessibilityGroupMeta[code]?.title || code,
       icon: accessibilityGroupMeta[code]?.icon || "bx bx-check-circle",
       color: accessibilityGroupMeta[code]?.color || "#075b91",
       hasHistoricalData:
-        historicalItems && typeof historicalItems === "object"
-          ? Object.keys(historicalItems).length > 0
-          : false,
+        Array.isArray(historicalItems)
+          ? historicalItems.length > 0
+          : Boolean(
+              historicalItems &&
+                typeof historicalItems === "object" &&
+                Object.keys(historicalItems).length > 0,
+            ),
       criteria: mapGroupCriteria(
         item,
         historicalItems,
@@ -625,16 +622,7 @@ export function mapAccessibilityGroups(
         totalReviews,
         questionGroups,
       ),
-      status: item.status,
-      statusLabel: statusLabels[item.status] || "Não avaliada",
-      statusClass:
-        item.status === "ACESSIVEL"
-          ? "accessible"
-          : item.status === "PARCIAL"
-            ? "partial"
-            : item.status === "PRECISA_MELHORAR"
-              ? "needs-work"
-              : "not-rated",
+      ...getStatusInfo(status),
       percentage: item.percentual,
       sim,
       nao,
